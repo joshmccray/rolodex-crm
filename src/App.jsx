@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { contacts } from './data/contacts';
+import { contacts as initialContacts } from './data/contacts';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import ActionCard from './components/ActionCard';
 import ContactCard from './components/ContactCard';
 import ContactDetail from './components/ContactDetail';
 import MessageModal from './components/MessageModal';
+import MarketAlertsPanel from './components/MarketAlertsPanel';
+import AlertSettingsModal from './components/AlertSettingsModal';
+import ShareSaleModal from './components/ShareSaleModal';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('actions');
@@ -14,6 +17,12 @@ export default function App() {
   const [sentActions, setSentActions] = useState([]);
   const [dismissedActions, setDismissedActions] = useState([]);
   const [showSentToast, setShowSentToast] = useState(false);
+
+  // Market alerts state
+  const [contacts, setContacts] = useState(initialContacts);
+  const [showAlertSettings, setShowAlertSettings] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
+  const [sharedSales, setSharedSales] = useState([]);
 
   // Compute all pending actions
   const allActions = contacts
@@ -24,9 +33,16 @@ export default function App() {
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
 
+  // Count contacts with market alerts enabled
+  const marketAlertCount = contacts.filter(c => c.marketAlerts?.enabled && (c.recentSales?.length || 0) > 0).length;
+
   const handleContactSelect = (contact) => {
     setSelectedContact(contact);
     setActiveTab('contact-detail');
+  };
+
+  const handleContactSelectForMarket = (contact) => {
+    setSelectedContact(contact);
   };
 
   const handleSend = (actionId) => {
@@ -47,12 +63,36 @@ export default function App() {
     ).length;
   };
 
+  // Market alert handlers
+  const handleUpdateAlertSettings = (newSettings) => {
+    if (!selectedContact) return;
+    setContacts(contacts.map(c =>
+      c.id === selectedContact.id
+        ? { ...c, marketAlerts: newSettings }
+        : c
+    ));
+    // Update selectedContact too
+    setSelectedContact({ ...selectedContact, marketAlerts: newSettings });
+  };
+
+  const handleShareSale = (sale) => {
+    setSelectedSale(sale);
+  };
+
+  const handleSendSaleMessage = (saleId) => {
+    setSharedSales([...sharedSales, saleId]);
+    setSelectedSale(null);
+    setShowSentToast(true);
+    setTimeout(() => setShowSentToast(false), 3000);
+  };
+
   return (
     <div style={{ minHeight: '100vh', maxWidth: '100vw', overflow: 'hidden' }}>
-      <Header 
+      <Header
         activeTab={activeTab}
         actionCount={allActions.length}
-        selectedContact={selectedContact}
+        marketAlertCount={marketAlertCount}
+        selectedContact={activeTab === 'contact-detail' ? selectedContact : null}
         onBack={() => setActiveTab('contacts')}
       />
 
@@ -72,12 +112,64 @@ export default function App() {
               </div>
             ) : (
               allActions.map(action => (
-                <ActionCard 
+                <ActionCard
                   key={action.id}
                   action={action}
                   onClick={() => setExpandedAction(action)}
                 />
               ))
+            )}
+          </>
+        )}
+
+        {/* Market Tab */}
+        {activeTab === 'market' && (
+          <>
+            {!selectedContact ? (
+              <>
+                {/* Contact Selector */}
+                <div style={{ marginBottom: 16 }}>
+                  <h3 style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: '#64748b',
+                    margin: '0 0 12px 0',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}>
+                    Select a contact
+                  </h3>
+                  {contacts.map(contact => (
+                    <ContactCard
+                      key={contact.id}
+                      contact={contact}
+                      pendingActions={0}
+                      onClick={() => handleContactSelectForMarket(contact)}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Back to contact list */}
+                <button
+                  onClick={() => setSelectedContact(null)}
+                  className="back-btn"
+                  style={{ marginBottom: 16 }}
+                >
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                  All Contacts
+                </button>
+                <MarketAlertsPanel
+                  contact={selectedContact}
+                  onShareSale={handleShareSale}
+                  onToggleAlerts={() => {}}
+                  onUpdateSettings={handleUpdateAlertSettings}
+                  onOpenSettings={() => setShowAlertSettings(true)}
+                />
+              </>
             )}
           </>
         )}
@@ -100,10 +192,17 @@ export default function App() {
         )}
       </div>
 
-      <BottomNav 
+      <BottomNav
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={(tab) => {
+          setActiveTab(tab);
+          if (tab !== 'market') {
+            // Don't clear selectedContact when leaving market tab
+            // to preserve state if user returns
+          }
+        }}
         actionCount={allActions.length}
+        marketAlertCount={marketAlertCount}
       />
 
       {/* Message Editor Modal */}
@@ -113,6 +212,25 @@ export default function App() {
           onClose={() => setExpandedAction(null)}
           onSend={handleSend}
           onDismiss={handleDismiss}
+        />
+      )}
+
+      {/* Alert Settings Modal */}
+      {showAlertSettings && selectedContact && (
+        <AlertSettingsModal
+          contact={selectedContact}
+          onClose={() => setShowAlertSettings(false)}
+          onSave={handleUpdateAlertSettings}
+        />
+      )}
+
+      {/* Share Sale Modal */}
+      {selectedSale && selectedContact && (
+        <ShareSaleModal
+          sale={selectedSale}
+          contact={selectedContact}
+          onClose={() => setSelectedSale(null)}
+          onSend={handleSendSaleMessage}
         />
       )}
 

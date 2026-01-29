@@ -16,6 +16,44 @@ export const contacts = [
     },
     address: { street: '1842 Maple Drive', city: 'Westside' },
     notes: 'Relocating for work in March. Needs 3BR minimum. Prefers modern construction.',
+    marketAlerts: {
+      enabled: true,
+      frequency: 'weekly',
+      radius: 0.5,
+      lastSent: '2025-01-22',
+    },
+    recentSales: [
+      {
+        id: 'rs1',
+        address: '1856 Maple Drive',
+        price: 485000,
+        soldDate: '2025-01-25',
+        distance: 0.1,
+        beds: 3,
+        baths: 2,
+        sqft: 1850,
+      },
+      {
+        id: 'rs2',
+        address: '1790 Maple Drive',
+        price: 512000,
+        soldDate: '2025-01-20',
+        distance: 0.2,
+        beds: 4,
+        baths: 2.5,
+        sqft: 2100,
+      },
+      {
+        id: 'rs3',
+        address: '220 Oak Lane',
+        price: 465000,
+        soldDate: '2025-01-18',
+        distance: 0.4,
+        beds: 3,
+        baths: 2,
+        sqft: 1720,
+      },
+    ],
     suggestedActions: [
       {
         id: 'sa1',
@@ -56,6 +94,54 @@ export const contacts = [
     },
     address: { street: '445 River Road', city: 'Riverside' },
     notes: 'Sold him a condo in 2021. Looking to upsize. Has a home to sell first.',
+    marketAlerts: {
+      enabled: true,
+      frequency: 'biweekly',
+      radius: 0.5,
+      lastSent: '2025-01-15',
+    },
+    recentSales: [
+      {
+        id: 'rs4',
+        address: '460 River Road',
+        price: 385000,
+        soldDate: '2025-01-26',
+        distance: 0.05,
+        beds: 3,
+        baths: 2,
+        sqft: 1650,
+      },
+      {
+        id: 'rs5',
+        address: '412 River Road',
+        price: 372000,
+        soldDate: '2025-01-19',
+        distance: 0.15,
+        beds: 3,
+        baths: 1.5,
+        sqft: 1520,
+      },
+      {
+        id: 'rs6',
+        address: '88 Riverside Ave',
+        price: 398000,
+        soldDate: '2025-01-12',
+        distance: 0.3,
+        beds: 4,
+        baths: 2,
+        sqft: 1890,
+      },
+      {
+        id: 'rs7',
+        address: '501 River Road',
+        price: 345000,
+        soldDate: '2025-01-08',
+        distance: 0.25,
+        beds: 2,
+        baths: 2,
+        sqft: 1380,
+      },
+    ],
     suggestedActions: [
       {
         id: 'sa3',
@@ -86,6 +172,44 @@ export const contacts = [
     },
     address: { street: '2200 Highland Ave', city: 'Highland Park' },
     notes: 'Zillow lead. Very motivated. Cash offer possible. Prefers single-story.',
+    marketAlerts: {
+      enabled: true,
+      frequency: 'weekly',
+      radius: 1,
+      lastSent: '2025-01-24',
+    },
+    recentSales: [
+      {
+        id: 'rs8',
+        address: '2185 Highland Ave',
+        price: 925000,
+        soldDate: '2025-01-27',
+        distance: 0.1,
+        beds: 4,
+        baths: 3,
+        sqft: 2650,
+      },
+      {
+        id: 'rs9',
+        address: '145 Crestwood Dr',
+        price: 1050000,
+        soldDate: '2025-01-21',
+        distance: 0.6,
+        beds: 5,
+        baths: 3.5,
+        sqft: 3100,
+      },
+      {
+        id: 'rs10',
+        address: '2301 Highland Ave',
+        price: 875000,
+        soldDate: '2025-01-15',
+        distance: 0.3,
+        beds: 4,
+        baths: 2.5,
+        sqft: 2400,
+      },
+    ],
     suggestedActions: [
       {
         id: 'sa4',
@@ -126,6 +250,13 @@ export const contacts = [
     },
     address: { street: '221 Maplewood Lane', city: 'Maplewood' },
     notes: 'Referred by Marcus Johnson. Listing appointment scheduled for next Tuesday.',
+    marketAlerts: {
+      enabled: false,
+      frequency: 'weekly',
+      radius: 0.5,
+      lastSent: null,
+    },
+    recentSales: [],
     suggestedActions: [
       {
         id: 'sa6',
@@ -156,6 +287,13 @@ export const contacts = [
     },
     address: { street: '78 Lake View Terrace', city: 'Lakefront' },
     notes: 'Met at neighborhood BBQ. Mentioned maybe buying a vacation property.',
+    marketAlerts: {
+      enabled: false,
+      frequency: 'monthly',
+      radius: 0.5,
+      lastSent: null,
+    },
+    recentSales: [],
     suggestedActions: [],
   },
 ];
@@ -173,4 +311,31 @@ export const actionTypeConfig = {
   'post-showing': { icon: '👋', label: 'Follow Up', color: '#3b82f6', bg: '#eff6ff' },
   'new-match': { icon: '✨', label: 'New Match', color: '#f59e0b', bg: '#fffbeb' },
   'reminder': { icon: '📅', label: 'Reminder', color: '#6366f1', bg: '#eef2ff' },
+};
+
+export const alertFrequencyOptions = [
+  { value: 'instant', label: 'Instant' },
+  { value: 'daily', label: 'Daily' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Bi-weekly' },
+  { value: 'monthly', label: 'Monthly' },
+  { value: 'quarterly', label: 'Quarterly' },
+];
+
+export const alertRadiusOptions = [
+  { value: 0.25, label: '0.25 mi' },
+  { value: 0.5, label: '0.5 mi' },
+  { value: 1, label: '1 mi' },
+  { value: 2, label: '2 mi' },
+];
+
+// Smart defaults based on timeline label
+export const getDefaultFrequency = (timeline) => {
+  switch (timeline) {
+    case 'active': return 'weekly';
+    case '3-6 months': return 'biweekly';
+    case '6-12 months': return 'monthly';
+    case 'someday': return 'monthly';
+    default: return 'weekly';
+  }
 };

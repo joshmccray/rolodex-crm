@@ -1,4 +1,24 @@
-export default function Header({ activeTab, actionCount, selectedContact, onBack }) {
+export default function Header({ activeTab, actionCount, marketAlertCount, selectedContact, onBack }) {
+  const getTitle = () => {
+    switch (activeTab) {
+      case 'actions': return 'Suggested Actions';
+      case 'market': return 'Market Alerts';
+      case 'contacts': return 'Contacts';
+      case 'contact-detail': return selectedContact?.name || 'Contact';
+      default: return 'TwoStory';
+    }
+  };
+
+  const getSubtitle = () => {
+    switch (activeTab) {
+      case 'actions': return 'AI-drafted messages ready to send';
+      case 'market': return 'Recent sales near your contacts';
+      case 'contacts': return 'All contacts';
+      case 'contact-detail': return selectedContact?.address ? `${selectedContact.address.street}, ${selectedContact.address.city}` : '';
+      default: return '';
+    }
+  };
+
   if (activeTab === 'contact-detail' && selectedContact) {
     return (
       <div className="header">
@@ -9,11 +29,11 @@ export default function Header({ activeTab, actionCount, selectedContact, onBack
             </svg>
             Contacts
           </button>
-          <a href={`tel:${selectedContact.phone}`} style={{ 
-            background: '#10b981', 
-            color: 'white', 
-            padding: '8px 16px', 
-            borderRadius: 8, 
+          <a href={`tel:${selectedContact.phone}`} style={{
+            background: '#10b981',
+            color: 'white',
+            padding: '8px 16px',
+            borderRadius: 8,
             textDecoration: 'none',
             fontSize: 14,
             fontWeight: 600,
@@ -40,7 +60,7 @@ export default function Header({ activeTab, actionCount, selectedContact, onBack
         color: '#1e293b',
         margin: 0,
       }}>
-        {activeTab === 'actions' ? 'Suggested Actions' : 'Contacts'}
+        {getTitle()}
         {activeTab === 'actions' && actionCount > 0 && (
           <span style={{
             background: '#ef4444',
@@ -53,12 +73,21 @@ export default function Header({ activeTab, actionCount, selectedContact, onBack
             verticalAlign: 'middle',
           }}>{actionCount}</span>
         )}
+        {activeTab === 'market' && marketAlertCount > 0 && (
+          <span style={{
+            background: '#8b5cf6',
+            color: 'white',
+            fontSize: 12,
+            fontWeight: 700,
+            padding: '2px 8px',
+            borderRadius: 10,
+            marginLeft: 10,
+            verticalAlign: 'middle',
+          }}>{marketAlertCount}</span>
+        )}
       </h1>
       <p style={{ fontSize: 13, color: '#94a3b8', margin: '4px 0 0' }}>
-        {activeTab === 'actions' 
-          ? 'AI-drafted messages ready to send'
-          : 'All contacts'
-        }
+        {getSubtitle()}
       </p>
     </div>
   );

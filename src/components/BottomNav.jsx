@@ -1,7 +1,13 @@
-export default function BottomNav({ activeTab, onTabChange, actionCount }) {
+export default function BottomNav({ activeTab, onTabChange, actionCount, marketAlertCount }) {
   return (
     <div className="bottom-nav">
-      <button 
+      {/* Brand - only visible on desktop via CSS */}
+      <div className="nav-brand">
+        <span className="nav-brand-icon">TS</span>
+        <span className="nav-brand-text">TwoStory</span>
+      </div>
+
+      <button
         className={`nav-item ${activeTab === 'actions' ? 'active' : ''}`}
         onClick={() => onTabChange('actions')}
       >
@@ -11,7 +17,17 @@ export default function BottomNav({ activeTab, onTabChange, actionCount }) {
         Actions
         {actionCount > 0 && <span className="nav-badge">{actionCount}</span>}
       </button>
-      <button 
+      <button
+        className={`nav-item ${activeTab === 'market' ? 'active' : ''}`}
+        onClick={() => onTabChange('market')}
+      >
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        Market
+        {marketAlertCount > 0 && <span className="nav-badge">{marketAlertCount}</span>}
+      </button>
+      <button
         className={`nav-item ${activeTab === 'contacts' || activeTab === 'contact-detail' ? 'active' : ''}`}
         onClick={() => onTabChange('contacts')}
       >
