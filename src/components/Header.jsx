@@ -5,6 +5,7 @@ export default function Header({ activeTab, actionCount, marketAlertCount, selec
       case 'market': return 'Market Alerts';
       case 'contacts': return 'Contacts';
       case 'contact-detail': return selectedContact?.name || 'Contact';
+      case 'account': return 'Account';
       default: return 'TwoStory';
     }
   };
@@ -15,6 +16,7 @@ export default function Header({ activeTab, actionCount, marketAlertCount, selec
       case 'market': return 'Recent sales near your contacts';
       case 'contacts': return 'All contacts';
       case 'contact-detail': return selectedContact?.address ? `${selectedContact.address.street}, ${selectedContact.address.city}` : '';
+      case 'account': return 'Manage your profile and settings';
       default: return '';
     }
   };

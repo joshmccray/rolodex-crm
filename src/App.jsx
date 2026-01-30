@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { contacts as initialContacts } from './data/contacts';
+import { useAuth } from './context/AuthContext';
+import { useData } from './context/DataContext';
 import Header from './components/Header';
 import BottomNav from './components/BottomNav';
 import ActionCard from './components/ActionCard';
@@ -9,8 +10,15 @@ import MessageModal from './components/MessageModal';
 import MarketAlertsPanel from './components/MarketAlertsPanel';
 import AlertSettingsModal from './components/AlertSettingsModal';
 import ShareSaleModal from './components/ShareSaleModal';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import AccountPage from './pages/AccountPage';
 
 export default function App() {
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { contacts, updateContact, updateMarketAlerts, loading, error } = useData();
+  const [authView, setAuthView] = useState('login'); // 'login' or 'register'
+
   const [activeTab, setActiveTab] = useState('actions');
   const [selectedContact, setSelectedContact] = useState(null);
   const [expandedAction, setExpandedAction] = useState(null);
@@ -19,7 +27,6 @@ export default function App() {
   const [showSentToast, setShowSentToast] = useState(false);
 
   // Market alerts state
-  const [contacts, setContacts] = useState(initialContacts);
   const [showAlertSettings, setShowAlertSettings] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
   const [sharedSales, setSharedSales] = useState([]);
@@ -64,13 +71,9 @@ export default function App() {
   };
 
   // Market alert handlers
-  const handleUpdateAlertSettings = (newSettings) => {
+  const handleUpdateAlertSettings = async (newSettings) => {
     if (!selectedContact) return;
-    setContacts(contacts.map(c =>
-      c.id === selectedContact.id
-        ? { ...c, marketAlerts: newSettings }
-        : c
-    ));
+    await updateMarketAlerts(selectedContact.id, newSettings);
     // Update selectedContact too
     setSelectedContact({ ...selectedContact, marketAlerts: newSettings });
   };
@@ -85,6 +88,66 @@ export default function App() {
     setShowSentToast(true);
     setTimeout(() => setShowSentToast(false), 3000);
   };
+
+  // Show auth loading state
+  if (authLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: 16,
+      }}>
+        <div style={{
+          width: 40,
+          height: 40,
+          border: '3px solid #e2e8f0',
+          borderTopColor: '#3b82f6',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }} />
+        <div style={{ color: '#64748b', fontSize: 14 }}>Loading...</div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  // Show login/register if not authenticated
+  // For now, we'll skip auth check when using mock data
+  const useMockData = import.meta.env.VITE_USE_REAL_API !== 'true';
+  if (!useMockData && !isAuthenticated) {
+    if (authView === 'register') {
+      return <RegisterPage onNavigateToLogin={() => setAuthView('login')} />;
+    }
+    return <LoginPage onNavigateToRegister={() => setAuthView('register')} />;
+  }
+
+  // Show loading state for contacts
+  if (loading && contacts.length === 0) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        gap: 16,
+      }}>
+        <div style={{
+          width: 40,
+          height: 40,
+          border: '3px solid #e2e8f0',
+          borderTopColor: '#3b82f6',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+        }} />
+        <div style={{ color: '#64748b', fontSize: 14 }}>Loading contacts...</div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', maxWidth: '100vw', overflow: 'hidden' }}>
@@ -189,6 +252,11 @@ export default function App() {
         {/* Contact Detail View */}
         {activeTab === 'contact-detail' && selectedContact && (
           <ContactDetail contact={selectedContact} />
+        )}
+
+        {/* Account Tab */}
+        {activeTab === 'account' && (
+          <AccountPage />
         )}
       </div>
 
