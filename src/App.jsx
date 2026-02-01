@@ -13,11 +13,13 @@ import ShareSaleModal from './components/ShareSaleModal';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AccountPage from './pages/AccountPage';
+import LandingPage from './pages/LandingPage';
 
 export default function App() {
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { contacts, updateContact, updateMarketAlerts, loading, error } = useData();
   const [authView, setAuthView] = useState('login'); // 'login' or 'register'
+  const [showLanding, setShowLanding] = useState(true); // Show landing by default
 
   const [activeTab, setActiveTab] = useState('actions');
   const [selectedContact, setSelectedContact] = useState(null);
@@ -88,6 +90,11 @@ export default function App() {
     setShowSentToast(true);
     setTimeout(() => setShowSentToast(false), 3000);
   };
+
+  // Show landing page
+  if (showLanding) {
+    return <LandingPage onEnterApp={() => setShowLanding(false)} />;
+  }
 
   // Show auth loading state
   if (authLoading) {
