@@ -1,8 +1,13 @@
-export default function BottomNav({ activeTab, onTabChange, actionCount, marketAlertCount }) {
+export default function BottomNav({ activeTab, onTabChange, actionCount, marketAlertCount, onLogoClick }) {
   return (
     <div className="bottom-nav">
       {/* Brand - only visible on desktop via CSS */}
-      <div className="nav-brand">
+      <div
+        className="nav-brand"
+        onClick={onLogoClick}
+        style={{ cursor: onLogoClick ? 'pointer' : 'default' }}
+        title="Back to homepage"
+      >
         <span className="nav-brand-icon">TS</span>
         <span className="nav-brand-text">TwoStory</span>
       </div>
